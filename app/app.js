@@ -9,7 +9,6 @@ const dbPath = "app/db/database.sqlite3"
 // リクエストのbodyをパースする設定
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
-
 // publicディレクトリを静的ファイル群のルートディレクトリとして設定
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -17,11 +16,9 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.get('/api/v1/users', (req, res) => {
   // Connect database
   const db = new sqlite3.Database(dbPath)
-
   db.all('SELECT * FROM users', (err, rows) => {
     res.json(rows)
   })
-
   db.close()
 })
 
@@ -30,7 +27,6 @@ app.get('/api/v1/users/:id', (req, res) => {
   // Connect database
   const db = new sqlite3.Database(dbPath)
   const id = req.params.id
-
   db.get(`SELECT * FROM users WHERE id = ${id}`, (err, row) => {
     if (!row) {
       res.status(404).send({error: "Not Found!"})
@@ -38,7 +34,6 @@ app.get('/api/v1/users/:id', (req, res) => {
       res.status(200).json(row)
     }
   })
-
   db.close()
 })
 
@@ -47,7 +42,6 @@ app.get('/api/v1/users/:id/following', (req, res) => {
   // Connect database
   const db = new sqlite3.Database(dbPath)
   const id = req.params.id
-
   db.all(`SELECT * FROM following LEFT JOIN users ON following.followed_id = users.id WHERE following_id = ${id};`, (err, rows) => {
     if (!rows) {
       res.status(404).send({error: "Not Found!"})
@@ -55,7 +49,6 @@ app.get('/api/v1/users/:id/following', (req, res) => {
       res.status(200).json(rows)
     }
   })
-
   db.close()
 })
 
@@ -64,11 +57,9 @@ app.get('/api/v1/search', (req, res) => {
   // Connect database
   const db = new sqlite3.Database(dbPath)
   const keyword = req.query.q
-
   db.all(`SELECT * FROM users WHERE name LIKE "%${keyword}%"`, (err, rows) => {
     res.json(rows)
   })
-
   db.close()
 })
 
@@ -91,11 +82,9 @@ app.post('/api/v1/users', async (req, res) => {
   } else {
     // Connect database
     const db = new sqlite3.Database(dbPath)
-
     const name = req.body.name
     const profile = req.body.profile ? req.body.profile : ""
     const dateOfBirth = req.body.date_of_birth ? req.body.date_of_birth : ""
-
     try {
       await run(
         `INSERT INTO users (name, profile, date_of_birth) VALUES ("${name}", "${profile}", "${dateOfBirth}")`,
@@ -105,7 +94,6 @@ app.post('/api/v1/users', async (req, res) => {
     } catch (e) {
       res.status(500).send({error: e})
     }
-
     db.close()
   }
 })
@@ -118,17 +106,14 @@ app.put('/api/v1/users/:id', async (req, res) => {
     // Connect database
     const db = new sqlite3.Database(dbPath)
     const id = req.params.id
-
     // 現在のユーザー情報を取得する
     db.get(`SELECT * FROM users WHERE id=${id}`, async (err, row) => {
-
       if (!row) {
         res.status(404).send({error: "指定されたユーザーが見つかりません。"})
       } else {
         const name = req.body.name ? req.body.name : row.name
         const profile = req.body.profile ? req.body.profile : row.profile
         const dateOfBirth = req.body.date_of_birth ? req.body.date_of_birth : row.date_of_birth
-
         try {
           await run(
             `UPDATE users SET name="${name}", profile="${profile}", date_of_birth="${dateOfBirth}" WHERE id=${id}`,
@@ -150,10 +135,8 @@ app.delete('/api/v1/users/:id', async (req, res) => {
   // Connect database
   const db = new sqlite3.Database(dbPath)
   const id = req.params.id
-
   // 現在のユーザー情報を取得する
   db.get(`SELECT * FROM users WHERE id=${id}`, async (err, row) => {
-
     if (!row) {
       res.status(404).send({error: "指定されたユーザーが見つかりません。"})
     } else {
@@ -165,7 +148,6 @@ app.delete('/api/v1/users/:id', async (req, res) => {
       }
     }
   })
-
   db.close()
 })
 
