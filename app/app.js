@@ -3,7 +3,6 @@ const app = express()
 const sqlite3 = require('sqlite3')
 const path = require('path')
 const bodyParser = require('body-parser')
-
 const dbPath = "app/db/database.sqlite3"
 
 // リクエストのbodyをパースする設定
@@ -125,7 +124,6 @@ app.put('/api/v1/users/:id', async (req, res) => {
         }
       }
     })
-
     db.close()
   }
 })
